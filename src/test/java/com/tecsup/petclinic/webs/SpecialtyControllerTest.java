@@ -122,5 +122,32 @@ public class SpecialtyControllerTest {
                 .andExpect(jsonPath("$.h_open", is(8)))
                 .andExpect(jsonPath("$.h_close", is(17)));
     }
+
+    /**
+     * Test 5: ELIMINAR especialidad
+     */
+    @Test
+    public void testDeleteSpecialty() throws Exception {
+
+        // Crea una especialidad antes de eliminar
+        SpecialtyDTO dto = new SpecialtyDTO();
+        dto.setName("ToDelete");
+        dto.setOffice("C10");
+        dto.setH_open(9);
+        dto.setH_close(15);
+
+        String response = mockMvc.perform(post("/specialties")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        SpecialtyDTO specialty = mapper.readValue(response, SpecialtyDTO.class);
+
+        // Eliminar especialidad
+        mockMvc.perform(delete("/specialties/" + specialty.getId()))
+                .andExpect(status().isOk());
+    }
 }
 
