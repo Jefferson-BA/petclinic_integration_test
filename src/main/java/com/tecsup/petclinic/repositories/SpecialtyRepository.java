@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface SpecialtyRepository extends JpaRepository<Specialty, Integer> {
 
-    List<Specialty> findByDescription(String description);
-
+    List<Specialty> findByName(String name);
 }

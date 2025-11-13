@@ -10,13 +10,13 @@ public interface SpecialtyService {
 
     SpecialtyDTO create(SpecialtyDTO dto);
 
-    SpecialtyDTO update(SpecialtyDTO dto);
+    SpecialtyDTO update(Integer id, SpecialtyDTO dto) throws SpecialtyNotFoundException;
 
     void delete(Integer id) throws SpecialtyNotFoundException;
 
     SpecialtyDTO findById(Integer id) throws SpecialtyNotFoundException;
 
-    List<SpecialtyDTO> findByDescription(String description);
+    List<SpecialtyDTO> findByName(String name);
 
     List<Specialty> findAll();
 }

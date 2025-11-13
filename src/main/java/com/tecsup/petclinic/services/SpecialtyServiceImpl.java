@@ -5,19 +5,16 @@ import com.tecsup.petclinic.entities.Specialty;
 import com.tecsup.petclinic.exceptions.SpecialtyNotFoundException;
 import com.tecsup.petclinic.mapper.SpecialtyMapper;
 import com.tecsup.petclinic.repositories.SpecialtyRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class SpecialtyServiceImpl implements SpecialtyService {
 
-    SpecialtyRepository repository;
-    SpecialtyMapper mapper;
+    private final SpecialtyRepository repository;
+    private final SpecialtyMapper mapper;
 
     public SpecialtyServiceImpl(SpecialtyRepository repository, SpecialtyMapper mapper) {
         this.repository = repository;
@@ -26,39 +23,50 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Override
     public SpecialtyDTO create(SpecialtyDTO dto) {
-        Specialty newSpecialty = repository.save(mapper.mapToEntity(dto));
-        return mapper.mapToDto(newSpecialty);
+        Specialty entity = mapper.mapToEntity(dto);
+        return mapper.mapToDto(repository.save(entity));
     }
 
     @Override
-    public SpecialtyDTO update(SpecialtyDTO dto) {
-        Specialty updated = repository.save(mapper.mapToEntity(dto));
-        return mapper.mapToDto(updated);
+    public SpecialtyDTO update(Integer id, SpecialtyDTO dto) throws SpecialtyNotFoundException {
+
+        Optional<Specialty> opt = repository.findById(id);
+
+        if (opt.isEmpty())
+            throw new SpecialtyNotFoundException("Specialty not found: " + id);
+
+        Specialty entity = opt.get();
+        entity.setName(dto.getName());
+        entity.setOffice(dto.getOffice());
+        entity.setH_open(dto.getH_open());
+        entity.setH_close(dto.getH_close());
+
+        return mapper.mapToDto(repository.save(entity));
     }
 
     @Override
     public void delete(Integer id) throws SpecialtyNotFoundException {
-        SpecialtyDTO dto = findById(id);
-        repository.delete(mapper.mapToEntity(dto));
+
+        if (!repository.existsById(id))
+            throw new SpecialtyNotFoundException("Specialty not found: " + id);
+
+        repository.deleteById(id);
     }
 
     @Override
     public SpecialtyDTO findById(Integer id) throws SpecialtyNotFoundException {
-        Optional<Specialty> specialty = repository.findById(id);
 
-        if (!specialty.isPresent())
-            throw new SpecialtyNotFoundException("Specialty not found!");
-
-        return mapper.mapToDto(specialty.get());
+        return repository.findById(id)
+                .map(mapper::mapToDto)
+                .orElseThrow(() -> new SpecialtyNotFoundException("Specialty not found: " + id));
     }
 
     @Override
-    public List<SpecialtyDTO> findByDescription(String description) {
-        List<Specialty> list = repository.findByDescription(description);
-
-        return list.stream()
+    public List<SpecialtyDTO> findByName(String name) {
+        return repository.findByName(name)
+                .stream()
                 .map(mapper::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
