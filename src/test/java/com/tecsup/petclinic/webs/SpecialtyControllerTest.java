@@ -35,7 +35,7 @@ public class SpecialtyControllerTest {
     }
 
     /**
-     * CREAR especialidad (según tu BD REAL)
+     * CREAR especialidad
      */
     @Test
     public void testCreateSpecialty() throws Exception {
