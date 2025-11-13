@@ -16,8 +16,8 @@ import java.util.List;
 @Slf4j
 public class SpecialtyController {
 
-    private SpecialtyService service;
-    private SpecialtyMapper mapper;
+    private final SpecialtyService service;
+    private final SpecialtyMapper mapper;
 
     public SpecialtyController(SpecialtyService service, SpecialtyMapper mapper) {
         this.service = service;
@@ -26,27 +26,18 @@ public class SpecialtyController {
 
     @GetMapping("/specialties")
     public ResponseEntity<List<SpecialtyDTO>> findAll() {
-
         List<Specialty> list = service.findAll();
-        List<SpecialtyDTO> dtoList = mapper.mapToDtoList(list);
-
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok(mapper.mapToDtoList(list));
     }
 
     @PostMapping("/specialties")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SpecialtyDTO> create(@RequestBody SpecialtyDTO dto) {
-
-        SpecialtyDTO newDto = service.create(dto);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(newDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.create(dto));
     }
 
     @GetMapping("/specialties/{id}")
-    public ResponseEntity<SpecialtyDTO> findById(@PathVariable Integer id) {
-
+    public ResponseEntity<?> findById(@PathVariable Integer id) {
         try {
             return ResponseEntity.ok(service.findById(id));
         } catch (SpecialtyNotFoundException e) {
@@ -55,24 +46,16 @@ public class SpecialtyController {
     }
 
     @PutMapping("/specialties/{id}")
-    public ResponseEntity<SpecialtyDTO> update(@RequestBody SpecialtyDTO dto, @PathVariable Integer id) {
-
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody SpecialtyDTO dto) {
         try {
-            SpecialtyDTO existing = service.findById(id);
-
-            existing.setDescription(dto.getDescription());
-
-            service.update(existing);
-            return ResponseEntity.ok(existing);
-
+            return ResponseEntity.ok(service.update(id, dto));
         } catch (SpecialtyNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/specialties/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id) {
-
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         try {
             service.delete(id);
             return ResponseEntity.ok("Deleted ID: " + id);
