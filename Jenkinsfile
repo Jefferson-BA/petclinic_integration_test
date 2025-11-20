@@ -17,12 +17,9 @@ pipeline {
             }
         }
 
-        // Nuevo Stage
-        stage('Nuevo Stage') {
-            steps {
-                echo "Este es el Stage del Grupo 4"
-            }
-        }
+
+
+      // xd
 
 
         stage('Build') {
